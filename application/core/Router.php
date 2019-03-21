@@ -42,14 +42,21 @@ class Router
   public function run()
   {
     if ($this->match()) {
-      $controller = 'application\controllers\\' . ucfirst($this->params['controller']) . 'Controller' . '.php';
-      if (class_exists($controller)) {
-        echo 'Ok';
+      $path = 'application\controllers\\' . ucfirst($this->params['controller']) . 'Controller';
+      if (class_exists($path)) {
+        $action = $this->params['action'] . 'Action';
+        if (method_exists($path, $action)) {
+          $controller = new $path($this->params);
+          $controller->$action();
+        } else {
+          View::errorCode(404);
+          //echo 'Action не найден ' . $action;
+        }
       } else {
-        echo 'Класс не найден ' . $controller;
+        View::errorCode(404);
       }
     } else {
-      echo 'Маршрут не найден!!!!!!!!!!!!!!!!';
+      View::errorCode(404);
     }
   }
 }
